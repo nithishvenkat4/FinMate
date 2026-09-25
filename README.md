@@ -301,7 +301,7 @@ The FastAPI gateway exposes modular, versioned endpoints under `/api/v1`:
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `POST` | `/api/v1/agent/query` | Submits a query to the multi-agent orchestrator; returns execution trace and synthesis |
+| `POST` | `/api/v1/agent/tasks` | Submits a query or financial scenario to the multi-agent orchestrator |
 | `GET` | `/api/v1/agent/tasks/{task_id}` | Retrieves execution trace, facts, predictions, and status of an agent task |
 | `POST` | `/api/v1/agent/approvals/{approval_id}/approve` | Approves a pending state mutation and commits updates to the database |
 | `POST` | `/api/v1/agent/approvals/{approval_id}/reject` | Rejects a pending state mutation without modifying stored records |
