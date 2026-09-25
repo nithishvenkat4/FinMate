@@ -4,11 +4,11 @@ import datetime
 from typing import List, Optional, Tuple
 import uuid
 from sqlalchemy.orm import Session
-from app.core.exceptions import EntityNotFoundException
+from app.core.exceptions import EntityNotFoundException, DuplicateEntityException
 from app.core.logging import logger
 from app.models.transaction import Transaction
 from app.repositories.transaction_repo import TransactionRepository
-from app.schemas.transaction import TransactionCreate, TransactionUpdate
+from app.schemas.transaction import TransactionCreate, TransactionUpdate, SmsTransactionCreate
 
 
 class TransactionService:
@@ -82,3 +82,31 @@ class TransactionService:
         tx = self.get_by_id(id, user_id)
         self.repo.delete(tx)
         logger.info("Deleted transaction %s for user %s", id, user_id)
+
+    def create_from_sms(self, user_id: uuid.UUID, data: SmsTransactionCreate) -> Transaction:
+        """Ingests a transaction from an SMS notification with duplicate protection."""
+        logger.info(
+            "Ingesting SMS transaction for user %s: sender=%s amount=%s hash=%s",
+            user_id, data.sender, data.amount, data.sms_hash
+        )
+        existing = self.repo.get_by_source_reference(
+            user_id=user_id,
+            source_type=data.source or "sms",
+            source_reference=data.sms_hash
+        )
+        if existing:
+            raise DuplicateEntityException("Transaction", "sms_hash", data.sms_hash)
+
+        tx_type = (data.type or "expense").lower()
+        tx = Transaction(
+            user_id=user_id,
+            transaction_date=data.transaction_date or datetime.date.today(),
+            description=(data.description or "SMS Transaction").strip(),
+            amount=data.amount,
+            transaction_type=tx_type,
+            category=(data.category or "Other").strip(),
+            source_type=(data.source or "sms").strip().lower(),
+            source_reference=data.sms_hash.strip(),
+            notes=f"Sender: {data.sender.strip()}"
+        )
+        return self.repo.create(tx)

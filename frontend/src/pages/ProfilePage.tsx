@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle2, UserCheck, Shield, AlertCircle, RefreshCw } from 'lucide-react';
+import { CheckCircle2, Shield, AlertCircle, RefreshCw, UserCheck } from 'lucide-react';
+import { TableSkeleton } from '../components/common/LoadingSkeleton';
 import { api } from '../services/api';
 import { FinancialProfile } from '../types';
-import { formatINR } from '../utils/formatters';
 
 interface ProfilePageProps {
   refreshKey: number;
@@ -10,7 +10,7 @@ interface ProfilePageProps {
 }
 
 export const ProfilePage: React.FC<ProfilePageProps> = ({ refreshKey, onRefresh }) => {
-  const [profile, setProfile] = useState<FinancialProfile | null>(null);
+  const [, setProfile] = useState<FinancialProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     monthly_income: '',
@@ -82,34 +82,75 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ refreshKey, onRefresh 
     }
   };
 
+  if (loading) {
+    return (
+      <div className="space-y-6 animate-fadeIn max-w-3xl">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Financial Profile</h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Maintain your core financial baselines used for cash flow and goal planning.
+          </p>
+        </div>
+        <TableSkeleton rows={3} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 animate-fadeIn max-w-3xl">
+      {/* Page Header */}
       <div>
-        <h2 className="text-2xl font-bold text-slate-100 tracking-tight">Financial Profile</h2>
-        <p className="text-sm text-slate-400">
-          Maintain your core financial baseline parameters. Used by deterministic cash flow services.
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Financial Profile</h1>
+        <p className="text-xs text-slate-500 mt-0.5">
+          Maintain your core financial baselines used for cash flow and goal planning.
         </p>
       </div>
 
       {successMsg && (
-        <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-300 text-xs flex items-center gap-3">
-          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+        <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs flex items-center gap-2.5">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>{successMsg}</span>
         </div>
       )}
 
       {errorMsg && (
-        <div className="p-4 rounded-xl border border-rose-500/20 bg-rose-500/10 text-rose-300 text-xs flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
+        <div className="p-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 text-xs flex items-center gap-2.5">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
           <span>{errorMsg}</span>
         </div>
       )}
 
-      <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-sm space-y-6">
+      {/* Account Info Summary Card */}
+      <div className="p-5 rounded-2xl border border-slate-200/80 bg-white shadow-xs flex items-center justify-between">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-full bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-600">
+            <UserCheck className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900">Demo User</h3>
+            <p className="text-[11px] text-slate-500">Default Household Profile • Currency: INR (₹)</p>
+          </div>
+        </div>
+        <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+          Active
+        </span>
+      </div>
+
+      {/* Profile Form Card */}
+      <div className="p-6 rounded-2xl border border-slate-200/80 bg-white shadow-xs space-y-6">
+        <div className="border-b border-slate-100 pb-3">
+          <h2 className="text-sm font-semibold text-slate-900">Financial Baseline Parameters</h2>
+          <p className="text-[11px] text-slate-500">
+            These values are used to evaluate your disposable income and savings capacity.
+          </p>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-5 text-xs">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-slate-300 font-medium mb-1.5">Gross Monthly Income (₹)</label>
+              <label className="block text-slate-700 font-medium mb-1.5">
+                Gross Monthly Income (₹)
+              </label>
               <input
                 type="number"
                 step="0.01"
@@ -117,29 +158,39 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ refreshKey, onRefresh 
                 required
                 value={formData.monthly_income}
                 onChange={(e) => setFormData({ ...formData, monthly_income: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 font-mono text-sm focus:outline-none focus:border-emerald-500/50"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-mono text-sm focus:outline-none focus:border-teal-500 focus:bg-white transition"
               />
-              <span className="text-[11px] text-slate-500 mt-1 block">Expected regular monthly earnings</span>
+              <span className="text-[11px] text-slate-400 mt-1 block">
+                Regular expected monthly earnings
+              </span>
             </div>
 
             <div>
-              <label className="block text-slate-300 font-medium mb-1.5">Fixed Monthly Expenses (₹)</label>
+              <label className="block text-slate-700 font-medium mb-1.5">
+                Fixed Monthly Expenses (₹)
+              </label>
               <input
                 type="number"
                 step="0.01"
                 min="0"
                 required
                 value={formData.monthly_fixed_expenses}
-                onChange={(e) => setFormData({ ...formData, monthly_fixed_expenses: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 font-mono text-sm focus:outline-none focus:border-emerald-500/50"
+                onChange={(e) =>
+                  setFormData({ ...formData, monthly_fixed_expenses: e.target.value })
+                }
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-mono text-sm focus:outline-none focus:border-teal-500 focus:bg-white transition"
               />
-              <span className="text-[11px] text-slate-500 mt-1 block">Rent, loan EMIs, insurance, utility baselines</span>
+              <span className="text-[11px] text-slate-400 mt-1 block">
+                Rent, loan EMIs, insurance, recurring bills
+              </span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-slate-300 font-medium mb-1.5">Current Liquid Savings (₹)</label>
+              <label className="block text-slate-700 font-medium mb-1.5">
+                Current Liquid Savings (₹)
+              </label>
               <input
                 type="number"
                 step="0.01"
@@ -147,43 +198,52 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ refreshKey, onRefresh 
                 required
                 value={formData.current_savings}
                 onChange={(e) => setFormData({ ...formData, current_savings: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 font-mono text-sm focus:outline-none focus:border-emerald-500/50"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-mono text-sm focus:outline-none focus:border-teal-500 focus:bg-white transition"
               />
-              <span className="text-[11px] text-slate-500 mt-1 block">Readily available bank/emergency funds</span>
+              <span className="text-[11px] text-slate-400 mt-1 block">
+                Readily available bank/emergency funds
+              </span>
             </div>
 
             <div>
-              <label className="block text-slate-300 font-medium mb-1.5">Declared Risk Appetite</label>
+              <label className="block text-slate-700 font-medium mb-1.5">
+                Investment Risk Preference
+              </label>
               <select
                 value={formData.risk_preference}
                 onChange={(e) => setFormData({ ...formData, risk_preference: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-sm focus:outline-none focus:border-emerald-500/50 capitalize"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:outline-none focus:border-teal-500 focus:bg-white transition capitalize"
               >
-                <option value="conservative">Conservative</option>
-                <option value="moderate">Moderate</option>
-                <option value="aggressive">Aggressive</option>
+                <option value="conservative">Conservative (Capital preservation focus)</option>
+                <option value="moderate">Moderate (Balanced growth and stability)</option>
+                <option value="aggressive">Aggressive (Long-term growth oriented)</option>
               </select>
-              <span className="text-[11px] text-slate-500 mt-1 block">User-stated guidance reference only</span>
+              <span className="text-[11px] text-slate-400 mt-1 block">
+                Used to tailor advice recommendations
+              </span>
             </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-800 flex justify-end">
+          <div className="pt-3 border-t border-slate-100 flex justify-end">
             <button
               type="submit"
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold bg-emerald-600 hover:bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-600/20 disabled:opacity-50 transition"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-semibold bg-teal-600 hover:bg-teal-700 text-white shadow-xs disabled:opacity-50 transition"
             >
-              {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
+              {saving && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
               <span>{saving ? 'Saving...' : 'Save Profile Changes'}</span>
             </button>
           </div>
         </form>
       </div>
 
-      <div className="p-4 rounded-xl border border-slate-800/80 bg-slate-900/40 text-xs text-slate-500 space-y-1">
-        <span className="font-semibold text-slate-400">Important Advisory Note:</span>
-        <p>
-          Declared risk preference in FinMate is a user-supplied personal parameter. It does not constitute a certified professional financial risk assessment.
+      <div className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/70 text-xs text-slate-500 space-y-1">
+        <div className="flex items-center gap-1.5 font-semibold text-slate-700">
+          <Shield className="w-3.5 h-3.5 text-teal-600" />
+          <span>Privacy & Data Control</span>
+        </div>
+        <p className="text-[11px] leading-relaxed">
+          Your financial parameters are stored locally on your FinMate instance and never shared with third parties.
         </p>
       </div>
     </div>

@@ -89,3 +89,17 @@ class TransactionRepository(BaseRepository[Transaction]):
         )
         rows = self.db.execute(stmt).all()
         return [(cat, Decimal(str(tot or 0)), cnt) for cat, tot, cnt in rows]
+
+    def get_by_source_reference(
+        self,
+        user_id: uuid.UUID,
+        source_type: str,
+        source_reference: str
+    ) -> Optional[Transaction]:
+        """Finds a transaction by user, source_type and source_reference (e.g. sms_hash)."""
+        stmt = select(Transaction).where(
+            Transaction.user_id == user_id,
+            Transaction.source_type == source_type,
+            Transaction.source_reference == source_reference
+        )
+        return self.db.scalars(stmt).first()

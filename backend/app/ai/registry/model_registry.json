@@ -1,0 +1,889 @@
+{
+  "models": {
+    "transaction_classification::KeywordBaseline::v1.0": {
+      "task": "transaction_classification",
+      "model_name": "KeywordBaseline",
+      "version": "v1.0",
+      "algorithm": "RuleBasedDictionary",
+      "hyperparameters": {
+        "rules_count": 13
+      },
+      "metrics": {
+        "accuracy": 0.6378,
+        "macro_precision": 0.92,
+        "macro_recall": 0.6173,
+        "macro_f1": 0.6833,
+        "weighted_precision": 0.9064,
+        "weighted_recall": 0.6378,
+        "weighted_f1": 0.689,
+        "confusion_matrix": [
+          [
+            8,
+            0,
+            0,
+            0,
+            0,
+            0,
+            19,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            10,
+            0,
+            0,
+            0,
+            0,
+            14,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            15,
+            0,
+            0,
+            0,
+            8,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            10,
+            0,
+            0,
+            14,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            8,
+            0,
+            12,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            19,
+            8,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            30,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            2,
+            25,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            9,
+            0,
+            25,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            8,
+            0,
+            0,
+            9,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            10,
+            0,
+            0,
+            0,
+            26,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            4,
+            2,
+            0,
+            0,
+            3,
+            14
+          ]
+        ],
+        "class_labels": [
+          "Education",
+          "Entertainment",
+          "Food",
+          "Freelance",
+          "Healthcare",
+          "Investment",
+          "Other",
+          "Rent",
+          "Salary",
+          "Shopping",
+          "Transport",
+          "Utilities"
+        ],
+        "sample_count": 312
+      },
+      "is_selected": false,
+      "is_baseline": true,
+      "artifact_path": null,
+      "notes": "Heuristic merchant keyword mapping",
+      "registered_at": "2026-09-22T15:03:02.089954+00:00"
+    },
+    "transaction_classification::TfidfLogisticRegression::v1.0": {
+      "task": "transaction_classification",
+      "model_name": "TfidfLogisticRegression",
+      "version": "v1.0",
+      "algorithm": "LogisticRegression(C=1.5, balanced)",
+      "hyperparameters": {
+        "C": 1.5,
+        "max_iter": 1000,
+        "ngram_range": [
+          1,
+          2
+        ]
+      },
+      "metrics": {
+        "accuracy": 0.9776,
+        "macro_precision": 0.9828,
+        "macro_recall": 0.9789,
+        "macro_f1": 0.9796,
+        "weighted_precision": 0.9822,
+        "weighted_recall": 0.9776,
+        "weighted_f1": 0.9785,
+        "confusion_matrix": [
+          [
+            27,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            22,
+            0,
+            0,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            23,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            24,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            20,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            26,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            29,
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            27,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            34,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            17,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            34,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            22
+          ]
+        ],
+        "class_labels": [
+          "Education",
+          "Entertainment",
+          "Food",
+          "Freelance",
+          "Healthcare",
+          "Investment",
+          "Other",
+          "Rent",
+          "Salary",
+          "Shopping",
+          "Transport",
+          "Utilities"
+        ],
+        "sample_count": 312
+      },
+      "is_selected": false,
+      "is_baseline": false,
+      "artifact_path": "classifier_logistic_regression.joblib",
+      "notes": "Multinomial logistic regression with sublinear TF-IDF",
+      "registered_at": "2026-09-22T15:03:02.422719+00:00"
+    },
+    "transaction_classification::TfidfCalibratedLinearSVC::v1.0": {
+      "task": "transaction_classification",
+      "model_name": "TfidfCalibratedLinearSVC",
+      "version": "v1.0",
+      "algorithm": "CalibratedClassifierCV(LinearSVC(C=1.0))",
+      "hyperparameters": {
+        "C": 1.0,
+        "cv": 3,
+        "ngram_range": [
+          1,
+          2
+        ]
+      },
+      "metrics": {
+        "accuracy": 0.984,
+        "macro_precision": 0.9856,
+        "macro_recall": 0.9859,
+        "macro_f1": 0.9849,
+        "weighted_precision": 0.9867,
+        "weighted_recall": 0.984,
+        "weighted_f1": 0.9845,
+        "confusion_matrix": [
+          [
+            27,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            24,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            23,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            24,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            20,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0,
+            0,
+            26,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            29,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            27,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            34,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            17,
+            0,
+            0
+          ],
+          [
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            34,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            22
+          ]
+        ],
+        "class_labels": [
+          "Education",
+          "Entertainment",
+          "Food",
+          "Freelance",
+          "Healthcare",
+          "Investment",
+          "Other",
+          "Rent",
+          "Salary",
+          "Shopping",
+          "Transport",
+          "Utilities"
+        ],
+        "sample_count": 312
+      },
+      "is_selected": true,
+      "is_baseline": false,
+      "artifact_path": "classifier_calibrated_svc.joblib",
+      "notes": "Linear support vector classifier with Platt probability calibration",
+      "registered_at": "2026-09-22T15:03:02.862621+00:00"
+    },
+    "expense_forecasting::MovingAverageBaseline::v1.0": {
+      "task": "expense_forecasting",
+      "model_name": "MovingAverageBaseline",
+      "version": "v1.0",
+      "algorithm": "RollingAverage(window=3)",
+      "hyperparameters": {
+        "window": 3
+      },
+      "metrics": {
+        "cv_mae": 4062.49,
+        "cv_rmse": 4995.92,
+        "cv_r2": -1.2024,
+        "n_splits": 3,
+        "holdout_mae": 4430.22,
+        "holdout_rmse": 5400.65,
+        "holdout_r2": -0.4729,
+        "residual_std": 4617.27,
+        "eval_count": 12,
+        "actual_vs_predicted": [
+          {
+            "actual": 35197.02,
+            "predicted": 45242.32
+          },
+          {
+            "actual": 34544.35,
+            "predicted": 41236.92
+          },
+          {
+            "actual": 37752.11,
+            "predicted": 38097.07
+          },
+          {
+            "actual": 40351.99,
+            "predicted": 35831.16
+          },
+          {
+            "actual": 43492.81,
+            "predicted": 37549.48
+          },
+          {
+            "actual": 44118.88,
+            "predicted": 40532.3
+          },
+          {
+            "actual": 37919.45,
+            "predicted": 42654.56
+          },
+          {
+            "actual": 39207.67,
+            "predicted": 41843.71
+          },
+          {
+            "actual": 40790.0,
+            "predicted": 40415.33
+          },
+          {
+            "actual": 48806.64,
+            "predicted": 39305.71
+          },
+          {
+            "actual": 46800.56,
+            "predicted": 42934.77
+          },
+          {
+            "actual": 46382.26,
+            "predicted": 45465.73
+          }
+        ]
+      },
+      "is_selected": false,
+      "is_baseline": true,
+      "artifact_path": null,
+      "notes": "Simple 3-month moving average persistence benchmark",
+      "registered_at": "2026-09-22T15:03:02.871665+00:00"
+    },
+    "expense_forecasting::RidgeRegression::v1.0": {
+      "task": "expense_forecasting",
+      "model_name": "RidgeRegression",
+      "version": "v1.0",
+      "algorithm": "Ridge(alpha=1.0)",
+      "hyperparameters": {
+        "alpha": 1.0,
+        "fit_intercept": true
+      },
+      "metrics": {
+        "cv_mae": 3905.17,
+        "cv_rmse": 4807.47,
+        "cv_r2": -2.5116,
+        "n_splits": 3,
+        "holdout_mae": 3369.93,
+        "holdout_rmse": 4011.82,
+        "holdout_r2": 0.1872,
+        "residual_std": 2585.09,
+        "eval_count": 12,
+        "actual_vs_predicted": [
+          {
+            "actual": 35197.02,
+            "predicted": 35003.07
+          },
+          {
+            "actual": 34544.35,
+            "predicted": 31261.82
+          },
+          {
+            "actual": 37752.11,
+            "predicted": 34597.43
+          },
+          {
+            "actual": 40351.99,
+            "predicted": 36736.45
+          },
+          {
+            "actual": 43492.81,
+            "predicted": 37565.93
+          },
+          {
+            "actual": 44118.88,
+            "predicted": 38903.63
+          },
+          {
+            "actual": 37919.45,
+            "predicted": 38936.03
+          },
+          {
+            "actual": 39207.67,
+            "predicted": 36717.34
+          },
+          {
+            "actual": 40790.0,
+            "predicted": 39933.24
+          },
+          {
+            "actual": 48806.64,
+            "predicted": 40799.68
+          },
+          {
+            "actual": 46800.56,
+            "predicted": 44597.17
+          },
+          {
+            "actual": 46382.26,
+            "predicted": 41905.91
+          }
+        ]
+      },
+      "is_selected": true,
+      "is_baseline": false,
+      "artifact_path": "forecaster_ridge.joblib",
+      "notes": "L2 regularized linear autoregressive model",
+      "registered_at": "2026-09-22T15:03:03.356635+00:00"
+    },
+    "expense_forecasting::RandomForestRegressor::v1.0": {
+      "task": "expense_forecasting",
+      "model_name": "RandomForestRegressor",
+      "version": "v1.0",
+      "algorithm": "RandomForestRegressor(n_estimators=50, max_depth=5)",
+      "hyperparameters": {
+        "n_estimators": 50,
+        "max_depth": 5,
+        "random_state": 42
+      },
+      "metrics": {
+        "cv_mae": 2572.49,
+        "cv_rmse": 2995.53,
+        "cv_r2": 0.2222,
+        "n_splits": 3,
+        "holdout_mae": 3470.49,
+        "holdout_rmse": 4283.87,
+        "holdout_r2": 0.0732,
+        "residual_std": 929.33,
+        "eval_count": 12,
+        "actual_vs_predicted": [
+          {
+            "actual": 35197.02,
+            "predicted": 35218.0
+          },
+          {
+            "actual": 34544.35,
+            "predicted": 33927.28
+          },
+          {
+            "actual": 37752.11,
+            "predicted": 36328.83
+          },
+          {
+            "actual": 40351.99,
+            "predicted": 38075.18
+          },
+          {
+            "actual": 43492.81,
+            "predicted": 35893.49
+          },
+          {
+            "actual": 44118.88,
+            "predicted": 36515.7
+          },
+          {
+            "actual": 37919.45,
+            "predicted": 36798.46
+          },
+          {
+            "actual": 39207.67,
+            "predicted": 35659.2
+          },
+          {
+            "actual": 40790.0,
+            "predicted": 35856.87
+          },
+          {
+            "actual": 48806.64,
+            "predicted": 42524.17
+          },
+          {
+            "actual": 46800.56,
+            "predicted": 43502.49
+          },
+          {
+            "actual": 46382.26,
+            "predicted": 43460.18
+          }
+        ]
+      },
+      "is_selected": false,
+      "is_baseline": false,
+      "artifact_path": "forecaster_rf.joblib",
+      "notes": "Non-linear tree ensemble capturing complex seasonal patterns",
+      "registered_at": "2026-09-22T15:03:03.360158+00:00"
+    },
+    "anomaly_detection::IsolationForestAnomalyDetector::v1.0": {
+      "task": "anomaly_detection",
+      "model_name": "IsolationForestAnomalyDetector",
+      "version": "v1.0",
+      "algorithm": "IsolationForest(n_estimators=100, contamination=0.04)",
+      "hyperparameters": {
+        "n_estimators": 100,
+        "contamination": 0.04,
+        "random_state": 42
+      },
+      "metrics": {
+        "training_samples": 1248,
+        "inliers_count": 1198,
+        "outliers_count": 50,
+        "contamination_rate": 0.04
+      },
+      "is_selected": true,
+      "is_baseline": false,
+      "artifact_path": "anomaly_detector.joblib",
+      "notes": "Unsupervised Isolation Forest to detect statistical deviation in transaction amounts",
+      "registered_at": "2026-09-22T15:03:03.760522+00:00"
+    }
+  },
+  "last_updated": "2026-09-22T15:03:03.760542+00:00"
+}

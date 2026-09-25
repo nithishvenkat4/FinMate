@@ -10,6 +10,7 @@ from app.db.session import get_db
 from app.repositories.user_repo import UserRepository
 from app.schemas.common import MessageResponse, PaginatedResponse
 from app.schemas.transaction import (
+    SmsTransactionCreate,
     TransactionCreate,
     TransactionResponse,
     TransactionUpdate,
@@ -73,6 +74,19 @@ def create_transaction(
     uid = tx_in.user_id or resolve_user_id(user_id, db)
     service = TransactionService(db)
     created = service.create(uid, tx_in)
+    return TransactionResponse.model_validate(created)
+
+
+@router.post("/from-sms", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
+def create_transaction_from_sms(
+    tx_in: SmsTransactionCreate,
+    user_id: Optional[uuid.UUID] = None,
+    db: Session = Depends(get_db)
+):
+    """Ingests a structured transaction extracted from an SMS message with duplicate protection."""
+    uid = resolve_user_id(user_id, db)
+    service = TransactionService(db)
+    created = service.create_from_sms(uid, tx_in)
     return TransactionResponse.model_validate(created)
 
 

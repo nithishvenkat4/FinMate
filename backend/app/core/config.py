@@ -31,11 +31,14 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: str = "INFO"
 
-    # Future AI Architecture Placeholders (Phase 1+)
-    LLM_PROVIDER: str = ""
+    # AI Intelligence Settings (Phase 3)
+    AI_PROVIDER: str = "mock"
+    LLM_PROVIDER: str = "mock"
+    LLM_MODEL: str = "gpt-4o-mini"
     LLM_API_KEY: str = ""
-    VECTOR_DATABASE_URL: str = ""
-    EMBEDDING_MODEL: str = ""
+    EMBEDDING_PROVIDER: str = "local"
+    EMBEDDING_MODEL: str = "tfidf-sublinear"
+    VECTOR_STORE: str = "in_memory"
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod

@@ -142,4 +142,70 @@ export const api = {
       body: formData,
     });
   },
+
+  // Phase 3 AI Intelligence APIs
+  classifyTransaction: (data: { description: string; amount?: number | string; transaction_type?: string }) =>
+    request<import('../types').TransactionClassificationResult>('/api/v1/ai/classify-transaction', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  forecastExpenses: (data: { recent_lags?: number[]; forecast_month?: number } = {}) =>
+    request<import('../types').ExpenseForecastResult>('/api/v1/ai/forecast-expenses', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  checkAnomaly: (data: { amount: number | string; category: string; is_weekend?: boolean }) =>
+    request<import('../types').AnomalyCheckResult>('/api/v1/ai/anomaly-check', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  retrieveGuidance: (query: string, top_k: number = 3) =>
+    request<import('../types').RAGRetrieveResult>('/api/v1/ai/retrieve', {
+      method: 'POST',
+      body: JSON.stringify({ query, top_k }),
+    }),
+  askFinMate: (question: string, include_financial_context: boolean = true) =>
+    request<import('../types').AIAskResult>('/api/v1/ai/ask', {
+      method: 'POST',
+      body: JSON.stringify({ question, include_financial_context }),
+    }),
+  getModelRegistry: () =>
+    request<import('../types').ModelRegistryResult>('/api/v1/ai/models'),
+
+  // Phase 4 Multi-Agent Intelligence APIs
+  createAgentTask: (query: string, user_id?: string) =>
+    request<import('../types').AgentTaskResult>('/api/v1/agent/tasks', {
+      method: 'POST',
+      body: JSON.stringify({ query, user_id }),
+    }),
+  getAgentTask: (taskId: string) =>
+    request<import('../types').AgentTaskResult>(`/api/v1/agent/tasks/${taskId}`),
+  getAgentTrace: (taskId: string) =>
+    request<import('../types').ExecutionStepItem[]>(`/api/v1/agent/tasks/${taskId}/trace`),
+  getPendingApprovals: () =>
+    request<import('../types').AgentApprovalItem[]>('/api/v1/agent/approvals/pending'),
+  approveAgentAction: (taskId: string, approvalId: string) =>
+    request<{ approval_id: string; task_id: string; status: string; message: string }>(
+      `/api/v1/agent/tasks/${taskId}/approve`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ approval_id: approvalId }),
+      }
+    ),
+  rejectAgentAction: (taskId: string, approvalId: string) =>
+    request<{ approval_id: string; task_id: string; status: string; message: string }>(
+      `/api/v1/agent/tasks/${taskId}/reject`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ approval_id: approvalId }),
+      }
+    ),
+  cancelAgentTask: (taskId: string) =>
+    request<{ task_id: string; status: string; message: string }>(
+      `/api/v1/agent/tasks/${taskId}/cancel`,
+      { method: 'POST' }
+    ),
+  getAgentTools: () =>
+    request<import('../types').AgentToolItem[]>('/api/v1/agent/tools'),
 };
+

@@ -1,0 +1,107 @@
+[
+  {
+    "id": "rag-q1",
+    "question": "What is an emergency fund and how much should I save?",
+    "expected_document": "emergency_fund_guide.md",
+    "expected_sources": ["NISM-CP-EMERGENCY-2025-03"],
+    "key_concepts": ["3 to 6 months", "mandatory living expenses", "liquid reserves", "safety and liquidity"]
+  },
+  {
+    "id": "rag-q2",
+    "question": "Where should I keep my emergency fund so it stays safe?",
+    "expected_document": "emergency_fund_guide.md",
+    "expected_sources": ["NISM-CP-EMERGENCY-2025-03"],
+    "key_concepts": ["sweep-in fixed deposits", "savings account", "liquid mutual funds", "never in equity"]
+  },
+  {
+    "id": "rag-q3",
+    "question": "Can I use my emergency fund to buy a laptop or go on vacation?",
+    "expected_document": "emergency_fund_guide.md",
+    "expected_sources": ["NISM-CP-EMERGENCY-2025-03"],
+    "key_concepts": ["non-qualified event", "upgrading gadgets", "misuse of reserves"]
+  },
+  {
+    "id": "rag-q4",
+    "question": "What is the 50/30/20 budgeting rule?",
+    "expected_document": "budgeting_principles.md",
+    "expected_sources": ["FPSB-IN-BUDGET-2025-01"],
+    "key_concepts": ["50% essential needs", "30% discretionary wants", "20% savings", "income allocation"]
+  },
+  {
+    "id": "rag-q5",
+    "question": "What is the cash surplus rule before making a major purchase?",
+    "expected_document": "budgeting_principles.md",
+    "expected_sources": ["FPSB-IN-BUDGET-2025-01"],
+    "key_concepts": ["accumulated liquid surplus", "without dipping into emergency funds", "30-day waiting rule"]
+  },
+  {
+    "id": "rag-q6",
+    "question": "What is the difference between debt avalanche and debt snowball?",
+    "expected_document": "budgeting_principles.md",
+    "expected_sources": ["FPSB-IN-BUDGET-2025-01"],
+    "key_concepts": ["highest nominal interest rate", "smallest balance first", "interest minimization", "psychological momentum"]
+  },
+  {
+    "id": "rag-q7",
+    "question": "What is the safe debt-to-income ratio recommended by banking guidelines?",
+    "expected_document": "rbi_financial_education.md",
+    "expected_sources": ["RBI-FIDD-FL-2025-01"],
+    "key_concepts": ["40% to 50%", "debt-to-income ratio", "EMI commitments", "take-home monthly income"]
+  },
+  {
+    "id": "rag-q8",
+    "question": "Why should I pay the full credit card bill instead of minimum amount due?",
+    "expected_document": "rbi_financial_education.md",
+    "expected_sources": ["RBI-FIDD-FL-2025-01"],
+    "key_concepts": ["revolving credit facility", "36% to 42% interest", "minimum amount due trap", "interest from purchase date"]
+  },
+  {
+    "id": "rag-q9",
+    "question": "Do I ever need to enter my UPI PIN to receive money into my account?",
+    "expected_document": "rbi_financial_education.md",
+    "expected_sources": ["RBI-FIDD-FL-2025-01"],
+    "key_concepts": ["UPI PIN exclusively for debiting", "never enter UPI PIN to receive funds", "confidentiality of credentials"]
+  },
+  {
+    "id": "rag-q10",
+    "question": "How quickly must I report an unauthorized bank transaction to limit liability?",
+    "expected_document": "rbi_financial_education.md",
+    "expected_sources": ["RBI-FIDD-FL-2025-01"],
+    "key_concepts": ["3 working days", "zero customer liability", "third-party breach", "timely reporting"]
+  },
+  {
+    "id": "rag-q11",
+    "question": "Why is asset diversification important according to SEBI?",
+    "expected_document": "sebi_investor_charter.md",
+    "expected_sources": ["SEBI-OIAE-CHARTER-2025-02"],
+    "key_concepts": ["uncorrelated asset classes", "idiosyncratic risk", "concentration risk", "equities debt precious metals"]
+  },
+  {
+    "id": "rag-q12",
+    "question": "Should I invest money needed within 1 year into the stock market?",
+    "expected_document": "sebi_investor_charter.md",
+    "expected_sources": ["SEBI-OIAE-CHARTER-2025-02"],
+    "key_concepts": ["less than 1 to 3 years", "not in volatile equity markets", "suitability and investment horizon"]
+  },
+  {
+    "id": "rag-q13",
+    "question": "How does inflation affect my cash savings over time?",
+    "expected_document": "inflation_and_compounding.md",
+    "expected_sources": ["NCFE-ED-INFLATION-2025-04"],
+    "key_concepts": ["erodes real purchasing power", "real return = nominal - inflation", "cash drag in savings accounts"]
+  },
+  {
+    "id": "rag-q14",
+    "question": "What is the Rule of 72 and how does it estimate investment doubling?",
+    "expected_document": "inflation_and_compounding.md",
+    "expected_sources": ["NCFE-ED-INFLATION-2025-04"],
+    "key_concepts": ["72 divided by r", "years to double", "exponential compound growth"]
+  },
+  {
+    "id": "rag-q15",
+    "question": "Why does starting to invest earlier make such a big difference?",
+    "expected_document": "inflation_and_compounding.md",
+    "expected_sources": ["NCFE-ED-INFLATION-2025-04"],
+    "key_concepts": ["time horizon", "compounding horizon", "exponential growth accelerates in later decades"]
+  }
+]
