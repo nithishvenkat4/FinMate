@@ -4,6 +4,7 @@ import { PageTab, Sidebar } from './components/common/Sidebar';
 import { AIAdvisorPage } from './pages/AIAdvisorPage';
 import { CSVImportPage } from './pages/CSVImportPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { DecisionsPage } from './pages/DecisionsPage';
 import { GoalsPage } from './pages/GoalsPage';
 import { InvestmentsPage } from './pages/InvestmentsPage';
 import { ProfilePage } from './pages/ProfilePage';
@@ -74,6 +75,9 @@ export function App() {
                 refreshKey={refreshKey}
                 onRefresh={handleGlobalRefresh}
               />
+            )}
+            {currentTab === 'decisions' && (
+              <DecisionsPage onNavigateTab={setCurrentTab} />
             )}
             {currentTab === 'ai-advisor' && <AIAdvisorPage />}
             {currentTab === 'settings' && <SettingsPage onNavigateTab={setCurrentTab} />}

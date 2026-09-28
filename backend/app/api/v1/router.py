@@ -13,6 +13,7 @@ from app.api.v1.endpoints import (
     data_quality,
     ai,
     agent,
+    decisions,
 )
 
 api_router = APIRouter()
@@ -28,4 +29,5 @@ api_router.include_router(imports.router)
 api_router.include_router(data_quality.router)
 api_router.include_router(ai.router)
 api_router.include_router(agent.router)
+api_router.include_router(decisions.router)
 

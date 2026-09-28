@@ -6,12 +6,13 @@ import {
   Percent,
   Plus,
   Target,
-  UploadCloud,
   Sparkles,
   TrendingUp,
   Receipt,
   AlertCircle,
   ArrowRight,
+  Compass,
+  Wallet,
 } from 'lucide-react';
 import {
   PieChart,
@@ -53,22 +54,25 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab, ref
   const [recentTxns, setRecentTxns] = useState<Transaction[]>([]);
   const [allTxns, setAllTxns] = useState<Transaction[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [sumRes, txRecentRes, txAllRes, goalRes] = await Promise.all([
+        const [sumRes, txRecentRes, txAllRes, goalRes, profRes] = await Promise.all([
           api.getAnalyticsSummary().catch(() => null),
           api.getTransactions({ page: 1, page_size: 5 }).catch(() => ({ items: [] })),
           api.getTransactions({ page: 1, page_size: 100 }).catch(() => ({ items: [] })),
           api.getGoals().catch(() => []),
+          api.getProfile().catch(() => null),
         ]);
         setSummary(sumRes);
         setRecentTxns(txRecentRes.items || []);
         setAllTxns(txAllRes.items || []);
         setGoals(goalRes || []);
+        setProfile(profRes);
       } catch (err) {
         console.error('Failed to load dashboard data:', err);
       } finally {
@@ -185,7 +189,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab, ref
       {/* 1. Greeting & Quick Actions Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Good morning, Demo</h1>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Good morning</h1>
           <p className="text-xs text-slate-500 mt-0.5">
             Keep track of your spending, savings, and financial goals in one place.
           </p>
@@ -194,18 +198,18 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab, ref
         {/* Quick Actions Bar */}
         <div className="flex items-center flex-wrap gap-2.5">
           <button
-            onClick={() => onNavigateTab('transactions')}
+            onClick={() => onNavigateTab('decisions')}
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-teal-600 hover:bg-teal-700 text-white shadow-xs transition"
+          >
+            <Compass className="w-3.5 h-3.5" />
+            <span>Decision Studio</span>
+          </button>
+          <button
+            onClick={() => onNavigateTab('transactions')}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 shadow-xs transition"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Transaction</span>
-          </button>
-          <button
-            onClick={() => onNavigateTab('import')}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 shadow-xs transition"
-          >
-            <UploadCloud className="w-3.5 h-3.5 text-slate-500" />
-            <span>Import CSV</span>
           </button>
           <button
             onClick={() => onNavigateTab('goals')}
@@ -219,7 +223,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab, ref
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium bg-teal-50 text-teal-800 border border-teal-100 hover:bg-teal-100 transition"
           >
             <Sparkles className="w-3.5 h-3.5 text-teal-600" />
-            <span>Ask FinMate</span>
+            <span>Ask Advisor</span>
           </button>
         </div>
       </div>
@@ -238,7 +242,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab, ref
       )}
 
       {/* 2. Key Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard
           title="Total Income"
           value={formatINR(summary?.total_income)}
@@ -261,12 +265,85 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab, ref
           color="teal"
         />
         <StatCard
+          title="Liquid Savings"
+          value={formatINR(profile?.current_savings || summary?.net_savings)}
+          subtitle="Available liquid cushion"
+          icon={Wallet}
+          color="cyan"
+        />
+        <StatCard
           title="Savings Rate"
           value={formatPercent(summary?.savings_rate)}
           subtitle="Percentage of income retained"
           icon={Percent}
           color="purple"
         />
+      </div>
+
+      {/* 2.5. HERO DECISION ENTRY POINT: "What are you planning?" */}
+      <div className="p-6 rounded-2xl border border-teal-200/90 bg-linear-to-r from-teal-50/70 via-white to-slate-50 shadow-xs space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="flex items-start gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <Compass className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-bold text-slate-900">What are you planning?</h2>
+                <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-teal-100 text-teal-800">
+                  Decision Intelligence
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 mt-0.5">
+                See the financial consequences before you make a decision. FinMate models the impact on your liquid reserves, monthly cashflow, and goal milestones.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => onNavigateTab('decisions')}
+            className="self-start md:self-auto flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-teal-600 hover:bg-teal-700 text-white shadow-xs transition shrink-0"
+          >
+            <span>Open Decision Studio</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* Quick launch interactive chips */}
+        <div className="pt-2 border-t border-teal-100/80">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 block mb-2">
+            Explore Decision Scenarios
+          </span>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => onNavigateTab('decisions')}
+              className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:border-teal-500 hover:bg-teal-50/50 text-xs font-medium text-slate-700 transition flex items-center gap-1.5 shadow-2xs"
+            >
+              <span className="text-teal-600 font-semibold">₹20,000</span>
+              <span>Can I afford a laptop?</span>
+            </button>
+            <button
+              onClick={() => onNavigateTab('decisions')}
+              className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:border-teal-500 hover:bg-teal-50/50 text-xs font-medium text-slate-700 transition flex items-center gap-1.5 shadow-2xs"
+            >
+              <span className="text-emerald-600 font-semibold">+₹5,000</span>
+              <span>What if I save more every month?</span>
+            </button>
+            <button
+              onClick={() => onNavigateTab('decisions')}
+              className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:border-teal-500 hover:bg-teal-50/50 text-xs font-medium text-slate-700 transition flex items-center gap-1.5 shadow-2xs"
+            >
+              <span className="text-blue-600 font-semibold">Target Milestone</span>
+              <span>Can I reach my education goal sooner?</span>
+            </button>
+            <button
+              onClick={() => onNavigateTab('decisions')}
+              className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:border-teal-500 hover:bg-teal-50/50 text-xs font-medium text-slate-700 transition flex items-center gap-1.5 shadow-2xs"
+            >
+              <span className="text-rose-600 font-semibold">+₹3,000</span>
+              <span>What if my rent increases?</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* 3. Middle Section: Expense Breakdown & Monthly Trend */}

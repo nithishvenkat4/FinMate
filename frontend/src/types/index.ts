@@ -295,4 +295,149 @@ export interface AgentToolItem {
   requires_approval: boolean;
 }
 
+// Phase 5 Financial Decision & What-If Simulation Types
+export type DecisionType =
+  | 'purchase'
+  | 'goal_contribution'
+  | 'large_expense'
+  | 'debt_payment'
+  | 'saving'
+  | 'investment'
+  | 'subscription'
+  | 'income_change'
+  | 'expense_change'
+  | 'custom';
+
+export interface BaselineFinancialState {
+  monthly_income: string | number;
+  monthly_expenses: string | number;
+  monthly_surplus: string | number;
+  monthly_discretionary_spending?: string | number;
+  current_savings: string | number;
+  available_cash: string | number;
+  savings_rate: string | number;
+  emergency_buffer_months?: string | number | null;
+  savings_coverage_months?: string | number | null;
+  has_sufficient_data: boolean;
+  notes: string[];
+}
+
+export interface FinancialImpact {
+  new_savings: string | number;
+  savings_change: string | number;
+  new_monthly_surplus: string | number;
+  surplus_change: string | number;
+  new_monthly_expenses: string | number;
+  expense_change: string | number;
+  cash_position_change: string | number;
+  projected_emergency_buffer_months?: string | number | null;
+  savings_coverage_months?: string | number | null;
+}
+
+export interface GoalImpactDetail {
+  goal_id: string;
+  goal_name: string;
+  target_amount: string | number;
+  current_amount: string | number;
+  remaining_amount: string | number;
+  current_monthly_saving: string | number;
+  required_monthly_saving: string | number;
+  estimated_months_to_goal?: number | null;
+  scenario_months_to_goal?: number | null;
+  timeline_difference_months?: number | null;
+  impact_summary: string;
+}
+
+export interface ScenarioResponse {
+  id?: string | null;
+  name: string;
+  description?: string | null;
+  assumptions: string[];
+  financial_impact: FinancialImpact;
+  goal_impact: GoalImpactDetail[];
+  savings_impact: Record<string, any>;
+  cash_flow_impact: Record<string, any>;
+  timeline_impact: Record<string, any>;
+  warnings: string[];
+}
+
+export interface DecisionExplanation {
+  summary: string;
+  what_changes: string[];
+  what_stays_unchanged: string[];
+  trade_off_analysis: string;
+  key_considerations: string[];
+}
+
+export interface DecisionSimulateRequest {
+  decision_type: DecisionType;
+  amount: number | string;
+  title: string;
+  description?: string | null;
+  category?: string | null;
+  affected_goal_id?: string | null;
+  custom_parameters?: Record<string, any>;
+  save_to_history?: boolean;
+}
+
+export interface DecisionSimulationResponse {
+  decision_id?: string | null;
+  decision: {
+    decision_type: string;
+    title: string;
+    description?: string | null;
+    amount: string | number;
+    category?: string | null;
+    created_at?: string;
+  };
+  baseline: BaselineFinancialState;
+  scenarios: ScenarioResponse[];
+  explanation: DecisionExplanation;
+  assumptions: string[];
+  warnings: string[];
+  data_limitations: string[];
+}
+
+export interface ScenarioCompareItem {
+  metric: string;
+  baseline: string;
+  scenarios: Record<string, string>;
+}
+
+export interface ScenarioCompareResponse {
+  title: string;
+  comparison_matrix: ScenarioCompareItem[];
+  scenarios_summary: Record<string, string>;
+  trade_off_summary: string;
+}
+
+export interface DecisionListItem {
+  id: string;
+  user_id: string;
+  decision_type: string;
+  title: string;
+  description?: string | null;
+  amount: string | number;
+  category?: string | null;
+  status: string;
+  scenario_count: number;
+  created_at: string;
+  goal_impact_summary?: string | null;
+}
+
+export interface DecisionDetailResponse {
+  id: string;
+  user_id: string;
+  decision_type: string;
+  title: string;
+  description?: string | null;
+  amount: string | number;
+  category?: string | null;
+  status: string;
+  scenarios: ScenarioResponse[];
+  metadata_json?: Record<string, any> | null;
+  created_at: string;
+  updated_at: string;
+}
+
 

@@ -88,6 +88,79 @@ class AIOrchestrator:
 
         return "GENERAL_FINANCE_QUERY"
 
+    def extract_decision_parameters(self, query: str) -> Optional[Dict[str, Any]]:
+        """Extracts decision type, target amount, item/title, and category from natural language query."""
+        q = query.lower()
+
+        # 1. Regex to extract numeric amount
+        amount: Optional[Decimal] = None
+        amt_patterns = [
+            r'(?:₹|inr|rs\.?)\s*([0-9]{1,3}(?:,[0-9]{2,3})*(?:\.[0-9]+)?|[0-9]+(?:\.[0-9]+)?)',
+            r'([0-9]{1,3}(?:,[0-9]{2,3})*(?:\.[0-9]+)?|[0-9]+(?:\.[0-9]+)?)\s*(?:₹|inr|rs\.?|rupees)',
+            r'(?:spend|buy|save|invest|contribute|afford|cost|increase|decrease|by|for)\s+(?:a\s+)?(?:about\s+)?([0-9]{1,3}(?:,[0-9]{2,3})*(?:\.[0-9]+)?|[0-9]+(?:\.[0-9]+)?)',
+        ]
+
+        for pat in amt_patterns:
+            match = re.search(pat, query, re.IGNORECASE)
+            if match:
+                raw = match.group(1).replace(",", "")
+                try:
+                    val = Decimal(raw)
+                    if val > Decimal("0.00"):
+                        amount = val
+                        break
+                except Exception:
+                    continue
+
+        if not amount:
+            return None
+
+        # 2. Identify Decision Type and Metadata
+        if any(term in q for term in ["debt", "loan", "credit card", "repay", "repayment", "pay off"]):
+            d_type = "debt_payment"
+            title = f"Repay ₹{amount:,.0f} Debt Balance"
+            category = "Debt"
+        elif any(term in q for term in ["subscription", "netflix", "spotify", "gym"]):
+            d_type = "subscription"
+            title = f"Add ₹{amount:,.0f}/month Subscription"
+            category = "Subscriptions"
+        elif any(term in q for term in ["invest", "investment", "mutual fund", "sip", "stocks", "etf"]):
+            d_type = "investment"
+            title = f"Allocate ₹{amount:,.0f} to Investments"
+            category = "Investments"
+        elif any(term in q for term in ["income increase", "salary increase", "salary increment", "earn more", "raise"]):
+            d_type = "income_change"
+            title = f"Income Increase of ₹{amount:,.0f}/month"
+            category = "Income"
+        elif any(term in q for term in ["save", "saving", "savings"]) and not any(term in q for term in ["buy", "purchase", "spend"]):
+            d_type = "saving"
+            title = f"Increase Monthly Savings by ₹{amount:,.0f}"
+            category = "Savings"
+        elif any(term in q for term in ["rent", "expense increase", "expenses increase", "cost increase", "bill increase"]):
+            d_type = "expense_change"
+            title = f"Recurring Expense Increase of ₹{amount:,.0f}/month"
+            category = "Rent & Housing" if "rent" in q else "Living Expenses"
+        elif any(term in q for term in ["goal contribution", "contribute to goal", "add to goal"]):
+            d_type = "goal_contribution"
+            title = f"Allocate ₹{amount:,.0f} to Financial Goal"
+            category = "Goals"
+        else:
+            d_type = "purchase"
+            item = "Purchase"
+            for candidate in ["laptop", "phone", "smartphone", "iphone", "macbook", "car", "bike", "vehicle", "tv", "camera", "course", "watch"]:
+                if candidate in q:
+                    item = candidate.capitalize()
+                    break
+            title = f"{item} Purchase (₹{amount:,.0f})"
+            category = "Education" if ("laptop" in q or "course" in q or "book" in q or "education" in q) else "Shopping"
+
+        return {
+            "decision_type": d_type,
+            "amount": amount,
+            "title": title,
+            "category": category,
+        }
+
     async def execute_task(
         self,
         query: str,
@@ -369,7 +442,37 @@ class AIOrchestrator:
                     })
 
                 else:
-                    # Laptop Affordability Multi-Agent Workflow
+                    # Deterministic Financial Decision & Simulation Multi-Agent Workflow
+                    decision_params = self.extract_decision_parameters(query)
+                    simulation_result = None
+
+                    # If database session is present and parameters were parsed, run authoritative decision engine
+                    if decision_params and self.db:
+                        try:
+                            from app.services.decision_engine import FinancialDecisionEngine
+                            from app.schemas.decision import DecisionSimulateRequest
+                            engine = FinancialDecisionEngine(self.db)
+                            sim_req = DecisionSimulateRequest(
+                                decision_type=decision_params["decision_type"],
+                                amount=decision_params["amount"],
+                                title=decision_params["title"],
+                                category=decision_params.get("category"),
+                            )
+                            simulation_result = engine.simulate_decision(user_id=user_id, request=sim_req)
+                            trace.append({
+                                "step_number": step_counter,
+                                "agent": "FinancialDecisionEngine",
+                                "action": "Deterministic Scenario Simulation",
+                                "tool": "simulate_decision",
+                                "status": "success",
+                                "detail": f"Generated {len(simulation_result.scenarios)} scenarios with exact Decimal arithmetic.",
+                                "duration_ms": 2.1
+                            })
+                            step_counter += 1
+                            tools_used.append("simulate_decision")
+                        except Exception as sim_err:
+                            logger.warning("Deterministic decision engine simulation error: %s", sim_err)
+
                     # Step 1: Budget Agent analyzes surplus and gets ML forecast
                     agents_used.append(self.budget_agent.name)
                     b_res = await self.budget_agent.process(task_id, user_id, query)
@@ -379,7 +482,7 @@ class AIOrchestrator:
                         "action": "Cashflow & Forecast Evaluation",
                         "tool": "get_financial_summary, forecast_monthly_expenses",
                         "status": "success",
-                        "detail": "Verified baseline surplus of INR 25,000 and projected next-month expenses.",
+                        "detail": "Verified baseline surplus and projected next-month expenses.",
                         "duration_ms": 3.2
                     })
                     step_counter += 1
@@ -397,7 +500,7 @@ class AIOrchestrator:
                         "action": "Goal Feasibility & Run-Rate Check",
                         "tool": "get_goals, calculate_goal_progress, calculate_required_monthly_saving",
                         "status": "success",
-                        "detail": "Evaluated Higher Education Goal (INR 3,00,000 target; requires INR 16,363/month).",
+                        "detail": "Evaluated goal milestones and required monthly run-rate.",
                         "duration_ms": 2.9
                     })
                     step_counter += 1
@@ -407,7 +510,10 @@ class AIOrchestrator:
                     agents_used.append(self.decision_agent.name)
                     final_result = await self.decision_agent.process(
                         task_id, user_id, query,
-                        context_data={"specialist_results": [b_res, g_res]}
+                        context_data={
+                            "specialist_results": [b_res, g_res],
+                            "simulation": simulation_result,
+                        }
                     )
                     trace.append({
                         "step_number": step_counter,

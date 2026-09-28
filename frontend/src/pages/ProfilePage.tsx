@@ -127,8 +127,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ refreshKey, onRefresh 
             <UserCheck className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-slate-900">Demo User</h3>
-            <p className="text-[11px] text-slate-500">Default Household Profile • Currency: INR (₹)</p>
+            <h3 className="text-sm font-semibold text-slate-900">Primary Account</h3>
+            <p className="text-[11px] text-slate-500">Household Profile • Currency: INR (₹)</p>
           </div>
         </div>
         <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">

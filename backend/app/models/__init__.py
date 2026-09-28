@@ -9,6 +9,7 @@ from app.models.goal import Goal
 from app.models.investment import Investment
 from app.models.feedback import Feedback
 from app.models.agent import AgentTask, AgentApproval, AgentToolCall
+from app.models.decision import Decision, Scenario
 
 __all__ = [
     "User",
@@ -22,5 +23,7 @@ __all__ = [
     "AgentTask",
     "AgentApproval",
     "AgentToolCall",
+    "Decision",
+    "Scenario",
 ]
 

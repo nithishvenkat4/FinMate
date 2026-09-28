@@ -95,7 +95,7 @@ export const Header: React.FC<HeaderProps> = ({
             <User className="w-4 h-4 text-slate-600" />
           </div>
           <div className="hidden sm:block text-left">
-            <p className="text-xs font-semibold text-slate-800 leading-tight">Demo User</p>
+            <p className="text-xs font-semibold text-slate-800 leading-tight">Primary Account</p>
             <p className="text-[11px] text-slate-500 leading-tight">Personal Account</p>
           </div>
         </div>

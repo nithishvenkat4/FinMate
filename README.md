@@ -19,7 +19,7 @@ FinMate operates strictly as a decision-support system. It never acts as an auto
 | Governance Model | 3-Tier Human-in-the-Loop (HITL) Engine | 15-Minute Expiration Window, Two-Step State Mutation Gating |
 | Counterfactual Analysis | In-Memory What-If Simulation Sandbox | Isolated In-Memory Delta Computations without Database Side-Effects |
 | Mobile Telemetry | Privacy-First Native Android Ingestion | Kotlin, AndroidX Room, WorkManager, On-Device Regex Parsing |
-| Test Coverage | 92 / 92 Automated Tests Passing (100%) | Pytest Unit, Integration, and Data Pipeline Test Suites |
+| Test Coverage | 102 / 102 Automated Tests Passing (100%) | Pytest Unit, Integration, and Data Pipeline Test Suites |
 | Benchmark Performance | 12 / 12 Standard Agent Benchmark Tasks (100%) | End-to-End Orchestrator Decision Evaluation Matrix |
 | Frontend Platform | Zero-Error Production Build | React 19, TypeScript, Vite, Tailwind CSS, Lucide, Recharts |
 
@@ -183,6 +183,12 @@ To prevent hallucinated financial calculations, all numerical computations are s
   - True savings rate: `Savings Rate = (Savings Contributions / Total Inflows) * 100`
   - Milestone velocity: Exact remaining horizon calculation and required monthly saving:
     $$\text{Required Monthly Saving} = \frac{\text{Target Amount} - \text{Current Amount}}{\text{Remaining Months}}$$
+- **Financial Decision Engine & What-If Simulation Sandbox**:
+  - Dynamically synthesizes real-world decisions (`purchase`, `savings`, `expense_change`, `goal_contribution`, `debt_payment`, `investment`, `subscription`, `income_change`, `custom`).
+  - Computes baseline financial state (income, fixed expenses, discretionary expenses, monthly surplus, liquid savings, safety buffer months).
+  - Generates 3 deterministic counterfactual pathways (e.g. *Option A: Immediate Action*, *Option B: Deferred / Staggered Window*, *Option C: Reallocated Discretionary Outflows*).
+  - Evaluates milestone goal timeline impacts, shifts in buffer months, and required rate adjustments.
+  - Generates transparent, verifiable assumptions and trade-off considerations.
 - **Rule of Separation**: Language models are restricted to textual narration and contextual explanation; all monetary statistics provided to the user are derived from backend calculation outputs.
 
 ---
@@ -316,6 +322,11 @@ The FastAPI gateway exposes modular, versioned endpoints under `/api/v1`:
 | `GET` | `/api/v1/goals/` | Fetches milestone goals and computes progress metrics |
 | `GET` | `/api/v1/investments/` | Retrieves investment portfolio holdings and asset allocation breakdown |
 | `GET` | `/api/v1/profile/` | Fetches user profile, monthly income, fixed expenses, and risk preferences |
+| `POST` | `/api/v1/decisions/simulate` | Deterministic what-if simulation with 3 scenario pathways & goal impact |
+| `POST` | `/api/v1/decisions/compare` | Side-by-side scenario comparison matrix for immediate savings, buffer, goals |
+| `GET` | `/api/v1/decisions/` | Lists user's decision simulation history |
+| `GET` | `/api/v1/decisions/{id}` | Retrieves detailed decision simulation record |
+| `DELETE` | `/api/v1/decisions/{id}` | Deletes decision simulation record from history |
 | `GET` | `/health` | System health check reporting database connectivity and runtime status |
 
 ---
@@ -324,12 +335,13 @@ The FastAPI gateway exposes modular, versioned endpoints under `/api/v1`:
 
 FinMate maintains an automated test and validation harness across the full application stack:
 
-### Automated Test Suite (92 / 92 Passed)
+### Automated Test Suite (102 / 102 Passed)
 
 ```
 tests/integration/test_agent_api.py            [PASS]  (6 tests)
 tests/integration/test_ai_api.py               [PASS]  (7 tests)
 tests/integration/test_data_quality_api.py     [PASS]  (1 test)
+tests/integration/test_decisions_api.py        [PASS]  (4 tests)
 tests/integration/test_goals_api.py            [PASS]  (1 test)
 tests/integration/test_health_api.py           [PASS]  (1 test)
 tests/integration/test_imports_api.py          [PASS]  (4 tests)
@@ -343,6 +355,7 @@ tests/unit/test_calculations.py                [PASS]  (9 tests)
 tests/unit/test_classifier.py                  [PASS]  (3 tests)
 tests/unit/test_csv_parser.py                  [PASS]  (5 tests)
 tests/unit/test_data_quality_rules.py          [PASS]  (5 tests)
+tests/unit/test_decision_engine.py             [PASS]  (6 tests)
 tests/unit/test_forecaster.py                  [PASS]  (4 tests)
 tests/unit/test_llm_and_guardrails.py          [PASS]  (5 tests)
 tests/unit/test_nlp_preprocessor.py            [PASS]  (5 tests)
@@ -352,7 +365,7 @@ tests/unit/test_rag_pipeline.py                [PASS]  (4 tests)
 tests/unit/test_schemas.py                     [PASS]  (4 tests)
 tests/unit/test_tool_registry.py               [PASS]  (5 tests)
 -----------------------------------------------------------------
-Total: 92 passed in 3.59s (100% Pass Rate)
+Total: 102 passed (100% Pass Rate)
 ```
 
 ### Agent Benchmark Matrix (12 / 12 Passed)

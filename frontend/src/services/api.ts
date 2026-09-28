@@ -207,5 +207,31 @@ export const api = {
     ),
   getAgentTools: () =>
     request<import('../types').AgentToolItem[]>('/api/v1/agent/tools'),
+
+  // Phase 5 Financial Decision & Simulation APIs
+  simulateDecision: (payload: import('../types').DecisionSimulateRequest) =>
+    request<import('../types').DecisionSimulationResponse>('/api/v1/decisions/simulate', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  compareScenarios: (simulation: import('../types').DecisionSimulationResponse) =>
+    request<import('../types').ScenarioCompareResponse>('/api/v1/decisions/compare', {
+      method: 'POST',
+      body: JSON.stringify({ simulation }),
+    }),
+
+  getDecisions: (page = 1, pageSize = 20) =>
+    request<{ items: import('../types').DecisionListItem[]; total: number; page: number; total_pages: number }>(
+      `/api/v1/decisions?page=${page}&page_size=${pageSize}`
+    ),
+
+  getDecision: (decisionId: string) =>
+    request<import('../types').DecisionDetailResponse>(`/api/v1/decisions/${decisionId}`),
+
+  deleteDecision: (decisionId: string) =>
+    request<{ message: string; success: boolean }>(`/api/v1/decisions/${decisionId}`, {
+      method: 'DELETE',
+    }),
 };
 

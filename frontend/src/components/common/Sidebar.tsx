@@ -9,17 +9,19 @@ import {
   Sparkles,
   Settings,
   ShieldCheck,
+  Compass,
   X,
 } from 'lucide-react';
 
 export type PageTab =
   | 'dashboard'
   | 'transactions'
-  | 'import'
   | 'goals'
   | 'investments'
-  | 'profile'
+  | 'decisions'
   | 'ai-advisor'
+  | 'profile'
+  | 'import'
   | 'settings';
 
 interface SidebarProps {
@@ -38,11 +40,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const navItems = [
     { id: 'dashboard' as PageTab, label: 'Dashboard', icon: LayoutDashboard },
     { id: 'transactions' as PageTab, label: 'Transactions', icon: Receipt },
-    { id: 'import' as PageTab, label: 'Import CSV', icon: UploadCloud },
     { id: 'goals' as PageTab, label: 'Goals', icon: Target },
     { id: 'investments' as PageTab, label: 'Investments', icon: TrendingUp },
-    { id: 'profile' as PageTab, label: 'Financial Profile', icon: UserCheck },
+    { id: 'decisions' as PageTab, label: 'Decision Studio', icon: Compass },
     { id: 'ai-advisor' as PageTab, label: 'AI Advisor', icon: Sparkles },
+    { id: 'profile' as PageTab, label: 'Financial Profile', icon: UserCheck },
+    { id: 'import' as PageTab, label: 'Import CSV', icon: UploadCloud },
     { id: 'settings' as PageTab, label: 'Settings', icon: Settings },
   ];
 
@@ -95,14 +98,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </nav>
       </div>
 
-      {/* Decision-Support System Calm Notice */}
+      {/* Security & User Control Calmer Notice */}
       <div className="p-3.5 rounded-xl border border-slate-200/80 bg-slate-50/80 text-xs text-slate-500 space-y-1">
         <div className="flex items-center gap-1.5 text-slate-700 font-semibold text-[11px]">
           <ShieldCheck className="w-3.5 h-3.5 text-teal-600 shrink-0" />
-          <span>Decision Support</span>
+          <span>Private & Verifiable</span>
         </div>
         <p className="text-[11px] leading-relaxed text-slate-500">
-          FinMate helps you evaluate spending and plan targets. You remain in control of every transaction.
+          FinMate helps you evaluate spending and plan targets. You remain in complete control of every transaction.
         </p>
       </div>
     </div>
