@@ -128,13 +128,24 @@ export const CSVImportPage: React.FC<CSVImportPageProps> = ({
           </p>
         </div>
 
-        <button
-          onClick={downloadSampleCsv}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 shadow-xs transition"
-        >
-          <Download className="w-3.5 h-3.5 text-teal-600" />
-          <span>Download Sample Template</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => downloadSampleCsv(true)}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-teal-50 text-teal-800 border border-teal-200 hover:bg-teal-100 shadow-xs transition"
+            title="Download Bank Statement format with Txn Date, Description, Cheque No, Debit Amount, Credit Amount, Balance"
+          >
+            <Download className="w-3.5 h-3.5 text-teal-600" />
+            <span>Bank Statement Template</span>
+          </button>
+          <button
+            onClick={() => downloadSampleCsv(false)}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 shadow-xs transition"
+            title="Download Standard Ledger format (Date, Description, Amount, Type, Category)"
+          >
+            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <span>Standard Template</span>
+          </button>
+        </div>
       </div>
 
       {/* 4-Step Visual Progress Stepper */}
@@ -173,26 +184,57 @@ export const CSVImportPage: React.FC<CSVImportPageProps> = ({
       </div>
 
       {/* Format Guidelines Card */}
-      <div className="p-4 rounded-2xl border border-slate-200/80 bg-slate-50/60 space-y-2 text-xs text-slate-600">
-        <div className="flex items-center gap-2 text-slate-800 font-semibold text-xs">
-          <HelpCircle className="w-4 h-4 text-teal-600" />
-          <span>Supported CSV Column Structure</span>
+      <div className="p-4 rounded-2xl border border-slate-200/80 bg-slate-50/60 space-y-3 text-xs text-slate-600">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-slate-800 font-semibold text-xs">
+            <HelpCircle className="w-4 h-4 text-teal-600" />
+            <span>Supported CSV Column Formats</span>
+          </div>
+          <span className="text-[11px] font-medium text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-100">
+            Auto-Detects Comma (,) &amp; Tab (\t) Separators
+          </span>
         </div>
         <p className="text-[11px] text-slate-500">
-          Your file must contain a header row. FinMate automatically standardizes date formats (YYYY-MM-DD or DD/MM/YYYY) and cleans currency characters.
+          FinMate automatically cleans currency symbols (₹, $, commas), detects standard Indian date formats (DD-MMM-YYYY, DD/MM/YYYY, YYYY-MM-DD), and supports both netbanking statement exports and standard ledger CSVs.
         </p>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono text-[11px]">
-          <div className="p-2 rounded-xl bg-white border border-slate-200 text-slate-700">
-            <span className="text-teal-700 font-semibold">date</span> (Required)
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+          {/* Format 1: Bank Statement */}
+          <div className="p-3 rounded-xl bg-white border border-teal-200/80 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-teal-900 text-xs">Option A: Bank Statement Export</span>
+              <span className="text-[10px] bg-teal-50 text-teal-700 px-1.5 py-0.5 rounded font-mono font-medium">Netbanking Default</span>
+            </div>
+            <div className="flex flex-wrap gap-1 font-mono text-[10px]">
+              <span className="px-2 py-1 rounded bg-teal-50 text-teal-800 border border-teal-100">Txn Date</span>
+              <span className="px-2 py-1 rounded bg-teal-50 text-teal-800 border border-teal-100">Description</span>
+              <span className="px-2 py-1 rounded bg-slate-50 text-slate-600 border border-slate-200">Cheque No</span>
+              <span className="px-2 py-1 rounded bg-rose-50 text-rose-700 border border-rose-100 font-semibold">Debit Amount</span>
+              <span className="px-2 py-1 rounded bg-emerald-50 text-emerald-700 border border-emerald-100 font-semibold">Credit Amount</span>
+              <span className="px-2 py-1 rounded bg-slate-50 text-slate-600 border border-slate-200">Balance</span>
+            </div>
+            <p className="text-[10px] text-slate-400">
+              * Debit amounts are logged as expenses; Credit amounts as income. Cheque No &amp; Balance are tracked automatically.
+            </p>
           </div>
-          <div className="p-2 rounded-xl bg-white border border-slate-200 text-slate-700">
-            <span className="text-teal-700 font-semibold">description</span> (Required)
-          </div>
-          <div className="p-2 rounded-xl bg-white border border-slate-200 text-slate-700">
-            <span className="text-teal-700 font-semibold">amount</span> (Required &gt; 0)
-          </div>
-          <div className="p-2 rounded-xl bg-white border border-slate-200 text-slate-700">
-            <span className="text-teal-700 font-semibold">type</span> (income / expense)
+
+          {/* Format 2: Standard Ledger */}
+          <div className="p-3 rounded-xl bg-white border border-slate-200 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-slate-800 text-xs">Option B: Standard Ledger</span>
+              <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono font-medium">Generic CSV</span>
+            </div>
+            <div className="flex flex-wrap gap-1 font-mono text-[10px]">
+              <span className="px-2 py-1 rounded bg-slate-50 text-slate-700 border border-slate-200 font-semibold">date</span>
+              <span className="px-2 py-1 rounded bg-slate-50 text-slate-700 border border-slate-200 font-semibold">description</span>
+              <span className="px-2 py-1 rounded bg-slate-50 text-slate-700 border border-slate-200 font-semibold">amount</span>
+              <span className="px-2 py-1 rounded bg-slate-50 text-slate-700 border border-slate-200 font-semibold">type (income/expense)</span>
+              <span className="px-2 py-1 rounded bg-slate-50 text-slate-500 border border-slate-200">category</span>
+              <span className="px-2 py-1 rounded bg-slate-50 text-slate-500 border border-slate-200">notes</span>
+            </div>
+            <p className="text-[10px] text-slate-400">
+              * Ideal for custom spreadsheets and exports where type is in a dedicated column.
+            </p>
           </div>
         </div>
       </div>
