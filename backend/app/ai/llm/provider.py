@@ -99,16 +99,126 @@ class MockLLMProvider(BaseLLMProvider):
         return schema.model_validate(data)
 
 
-class OpenAILLMProvider(BaseLLMProvider):
-    """OpenAI API integration for production natural language explanations."""
+class GeminiLLMProvider(BaseLLMProvider):
+    """Google Gemini API integration for natural language explanations & decision support."""
 
-    def __init__(self, api_key: str, model_name: str = "gpt-4o-mini"):
+    def __init__(
+        self,
+        api_key: str,
+        model_name: str = "gemini-1.5-flash",
+        base_url: Optional[str] = None
+    ):
         self.api_key = api_key
-        self.model_name = model_name
+        self.model_name = model_name or "gemini-1.5-flash"
+        self.base_url = (base_url or "https://generativelanguage.googleapis.com").rstrip("/")
 
     async def generate(self, prompt: str, system_message: str = "") -> str:
         import httpx
-        url = "https://api.openai.com/v1/chat/completions"
+        url = f"{self.base_url}/v1beta/models/{self.model_name}:generateContent?key={self.api_key}"
+        headers = {"Content-Type": "application/json"}
+
+        payload: Dict[str, Any] = {
+            "contents": [
+                {
+                    "role": "user",
+                    "parts": [{"text": prompt}]
+                }
+            ],
+            "generationConfig": {
+                "temperature": 0.2
+            }
+        }
+        if system_message:
+            payload["systemInstruction"] = {
+                "parts": [{"text": system_message}]
+            }
+
+        async with httpx.AsyncClient(timeout=25.0) as client:
+            resp = await client.post(url, headers=headers, json=payload)
+            resp.raise_for_status()
+            data = resp.json()
+
+        try:
+            return data["candidates"][0]["content"]["parts"][0]["text"]
+        except (KeyError, IndexError) as err:
+            logger.error("Unexpected Gemini response structure: %s", data)
+            raise ValueError(f"Gemini API returned malformed response: {err}") from err
+
+    async def generate_structured(
+        self,
+        prompt: str,
+        system_message: str,
+        schema: Type[T]
+    ) -> T:
+        import httpx
+        import re
+        url = f"{self.base_url}/v1beta/models/{self.model_name}:generateContent?key={self.api_key}"
+        headers = {"Content-Type": "application/json"}
+
+        schema_json = json.dumps(schema.model_json_schema())
+        json_prompt = (
+            f"{prompt}\n\n"
+            f"IMPORTANT: Return your response strictly as valid JSON matching this schema:\n"
+            f"{schema_json}\n"
+            f"Do not wrap output in markdown code fences, backticks, or comments."
+        )
+
+        payload: Dict[str, Any] = {
+            "contents": [
+                {
+                    "role": "user",
+                    "parts": [{"text": json_prompt}]
+                }
+            ],
+            "generationConfig": {
+                "temperature": 0.2,
+                "responseMimeType": "application/json"
+            }
+        }
+        if system_message:
+            payload["systemInstruction"] = {
+                "parts": [{"text": system_message}]
+            }
+
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(url, headers=headers, json=payload)
+            resp.raise_for_status()
+            data = resp.json()
+
+        try:
+            raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
+        except (KeyError, IndexError) as err:
+            logger.error("Unexpected Gemini response structure: %s", data)
+            raise ValueError(f"Gemini API returned malformed response: {err}") from err
+
+        clean_text = raw_text.strip()
+        if clean_text.startswith("```"):
+            clean_text = re.sub(r"^```(?:json)?\s*", "", clean_text)
+            clean_text = re.sub(r"\s*```$", "", clean_text)
+
+        res_json = json.loads(clean_text)
+        if hasattr(schema, "model_fields") and "provider" in schema.model_fields:
+            if not res_json.get("provider"):
+                res_json["provider"] = f"gemini ({self.model_name})"
+        return schema.model_validate(res_json)
+
+
+class OpenAILLMProvider(BaseLLMProvider):
+    """OpenAI API integration for production natural language explanations."""
+
+    def __init__(
+        self,
+        api_key: str,
+        model_name: str = "gpt-4o-mini",
+        base_url: Optional[str] = None
+    ):
+        self.api_key = api_key
+        self.model_name = model_name
+        self.base_url = (base_url or getattr(settings, "LLM_BASE_URL", "") or "https://api.openai.com/v1").rstrip("/")
+
+    async def generate(self, prompt: str, system_message: str = "") -> str:
+        import httpx
+        url = f"{self.base_url}/chat/completions"
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
@@ -134,7 +244,7 @@ class OpenAILLMProvider(BaseLLMProvider):
         schema: Type[T]
     ) -> T:
         import httpx
-        url = "https://api.openai.com/v1/chat/completions"
+        url = f"{self.base_url}/chat/completions"
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
@@ -156,18 +266,40 @@ class OpenAILLMProvider(BaseLLMProvider):
             resp = await client.post(url, headers=headers, json=payload)
             resp.raise_for_status()
             res_json = json.loads(resp.json()["choices"][0]["message"]["content"])
+            if hasattr(schema, "model_fields") and "provider" in schema.model_fields:
+                if not res_json.get("provider"):
+                    res_json["provider"] = f"openai ({self.model_name})"
             return schema.model_validate(res_json)
 
 
 def get_llm_provider(override_provider: Optional[str] = None) -> BaseLLMProvider:
     """Factory creating appropriate LLM provider based on settings."""
-    provider_type = override_provider or getattr(settings, "LLM_PROVIDER", "mock") or "mock"
-    provider_type = provider_type.lower().strip()
+    provider_type = (override_provider or getattr(settings, "LLM_PROVIDER", "mock") or "mock").lower().strip()
+    api_key = getattr(settings, "LLM_API_KEY", "") or getattr(settings, "GEMINI_API_KEY", "")
 
-    if provider_type == "openai" and getattr(settings, "LLM_API_KEY", ""):
-        return OpenAILLMProvider(
-            api_key=settings.LLM_API_KEY,
-            model_name=getattr(settings, "LLM_MODEL", "gpt-4o-mini") or "gpt-4o-mini"
+    # Auto-detect Gemini if provider is gemini, model has gemini, or key starts with AIza
+    is_gemini = (
+        provider_type == "gemini" or
+        "gemini" in getattr(settings, "LLM_MODEL", "").lower() or
+        (api_key.startswith("AIza") and provider_type != "openai")
+    )
+
+    if (provider_type == "gemini" or is_gemini) and api_key:
+        model_name = getattr(settings, "LLM_MODEL", "gemini-1.5-flash") or "gemini-1.5-flash"
+        if not model_name.startswith("gemini"):
+            model_name = "gemini-1.5-flash"
+        return GeminiLLMProvider(
+            api_key=api_key,
+            model_name=model_name,
+            base_url=getattr(settings, "LLM_BASE_URL", None) or None
         )
+
+    if provider_type == "openai" and api_key:
+        return OpenAILLMProvider(
+            api_key=api_key,
+            model_name=getattr(settings, "LLM_MODEL", "gpt-4o-mini") or "gpt-4o-mini",
+            base_url=getattr(settings, "LLM_BASE_URL", None) or None
+        )
+
     # Default to robust, zero-cost mock provider
     return MockLLMProvider()

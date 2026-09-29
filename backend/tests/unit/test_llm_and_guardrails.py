@@ -98,3 +98,118 @@ def test_deterministic_fallback():
     assert "₹60,000.00" in fb.summary
     assert fb.user_decision_required is True
     assert fb.provider == "fallback-deterministic"
+
+
+@pytest.mark.asyncio
+async def test_gemini_llm_provider_generate(monkeypatch):
+    from app.ai.llm.provider import GeminiLLMProvider
+    import httpx
+
+    class FakeResponse:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {
+                "candidates": [
+                    {
+                        "content": {
+                            "parts": [{"text": "Based on your financial profile, you can afford this purchase."}]
+                        }
+                    }
+                ]
+            }
+
+    class FakeAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def post(self, url, headers=None, json=None):
+            assert "key=fake-gemini-key" in url
+            return FakeResponse()
+
+    monkeypatch.setattr(httpx, "AsyncClient", FakeAsyncClient)
+
+    provider = GeminiLLMProvider(api_key="fake-gemini-key", model_name="gemini-1.5-flash")
+    result = await provider.generate(prompt="Can I afford a laptop?")
+    assert "afford this purchase" in result
+
+
+@pytest.mark.asyncio
+async def test_gemini_llm_provider_generate_structured(monkeypatch):
+    from app.ai.llm.provider import GeminiLLMProvider
+    import httpx
+
+    mock_json = (
+        '{"summary": "You have sufficient surplus for the laptop.", '
+        '"key_factors": ["High surplus", "Stable income"], '
+        '"evidence_used": ["Verified transactions"], '
+        '"uncertainties": ["Potential utility spike"], '
+        '"action_options": ["Option A: Buy outright", "Option B: Wait 30 days"], '
+        '"user_decision_required": true}'
+    )
+
+    class FakeResponse:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {
+                "candidates": [
+                    {
+                        "content": {
+                            "parts": [{"text": f"```json\n{mock_json}\n```"}]
+                        }
+                    }
+                ]
+            }
+
+    class FakeAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def post(self, url, headers=None, json=None):
+            return FakeResponse()
+
+    monkeypatch.setattr(httpx, "AsyncClient", FakeAsyncClient)
+
+    provider = GeminiLLMProvider(api_key="fake-gemini-key", model_name="gemini-1.5-flash")
+    resp = await provider.generate_structured(
+        prompt="Synthesize decision",
+        system_message="FinMate Assistant",
+        schema=StructuredDecisionResponse
+    )
+    assert isinstance(resp, StructuredDecisionResponse)
+    assert "laptop" in resp.summary
+    assert len(resp.action_options) == 2
+    assert "gemini" in resp.provider
+
+
+def test_get_llm_provider_factory(monkeypatch):
+    from app.ai.llm.provider import get_llm_provider, GeminiLLMProvider, MockLLMProvider
+    from app.core.config import settings
+
+    monkeypatch.setattr(settings, "LLM_PROVIDER", "mock")
+    monkeypatch.setattr(settings, "LLM_API_KEY", "")
+    monkeypatch.setattr(settings, "GEMINI_API_KEY", "")
+    prov = get_llm_provider()
+    assert isinstance(prov, MockLLMProvider)
+
+    # With Gemini configured
+    monkeypatch.setattr(settings, "LLM_PROVIDER", "gemini")
+    monkeypatch.setattr(settings, "LLM_API_KEY", "AIzaSyFakeKey123")
+    prov2 = get_llm_provider()
+    assert isinstance(prov2, GeminiLLMProvider)
+

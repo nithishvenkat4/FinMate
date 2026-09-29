@@ -8,19 +8,30 @@ from app.core.config import settings
 from app.core.logging import logger
 
 
+def normalize_db_url(url: str) -> str:
+    """Normalizes Postgres URL schemes provided by cloud hosts like Render or Railway."""
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+psycopg://", 1)
+    if url.startswith("postgresql://") and not url.startswith("postgresql+"):
+        return url.replace("postgresql://", "postgresql+psycopg://", 1)
+    return url
+
+
 def init_engine() -> Engine:
     """Initializes database engine targeting PostgreSQL with seamless fallback to SQLite if PostgreSQL is unavailable."""
-    if settings.DATABASE_URL.startswith("postgresql"):
+    target_url = normalize_db_url(settings.DATABASE_URL)
+
+    if target_url.startswith("postgresql"):
         try:
             pg_engine = create_engine(
-                settings.DATABASE_URL,
-                connect_args={"connect_timeout": 2},
+                target_url,
+                connect_args={"connect_timeout": 3},
                 pool_pre_ping=True,
                 echo=False
             )
             with pg_engine.connect() as conn:
                 conn.execute(text("SELECT 1"))
-            logger.info("Connected successfully to primary PostgreSQL database at %s", settings.DATABASE_URL.split("@")[-1])
+            logger.info("Connected successfully to primary PostgreSQL database at %s", target_url.split("@")[-1])
             return pg_engine
         except Exception as exc:
             logger.warning(
@@ -35,9 +46,9 @@ def init_engine() -> Engine:
                 echo=False
             )
     else:
-        connect_args = {"check_same_thread": False} if settings.DATABASE_URL.startswith("sqlite") else {}
+        connect_args = {"check_same_thread": False} if target_url.startswith("sqlite") else {}
         return create_engine(
-            settings.DATABASE_URL,
+            target_url,
             connect_args=connect_args,
             pool_pre_ping=True,
             echo=False

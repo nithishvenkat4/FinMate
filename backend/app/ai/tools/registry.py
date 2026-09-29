@@ -766,7 +766,7 @@ class ToolRegistry:
                 "target_date": str(g.target_date),
                 "progress_percentage": str(pct),
                 "priority": g.priority,
-                "status": g.status
+                "status": getattr(g, "status", None) or ("completed" if pct >= 100 else "in_progress")
             })
         return res
 

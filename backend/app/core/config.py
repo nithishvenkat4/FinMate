@@ -34,8 +34,10 @@ class Settings(BaseSettings):
     # AI Intelligence Settings (Phase 3)
     AI_PROVIDER: str = "mock"
     LLM_PROVIDER: str = "mock"
-    LLM_MODEL: str = "gpt-4o-mini"
+    LLM_MODEL: str = "gemini-1.5-flash"
     LLM_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
+    LLM_BASE_URL: str = ""
     EMBEDDING_PROVIDER: str = "local"
     EMBEDDING_MODEL: str = "tfidf-sublinear"
     VECTOR_STORE: str = "in_memory"
