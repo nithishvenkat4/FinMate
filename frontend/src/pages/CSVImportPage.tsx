@@ -29,6 +29,15 @@ const SAMPLE_CSV = `date,description,amount,type,category,notes
 2026-09-06,Electricity,1800,expense,Utilities,Power bill
 `;
 
+const SAMPLE_BANK_CSV = `Txn Date,Description,Cheque No,Debit Amount,Credit Amount,Balance
+2026-09-01,Monthly Salary Credit,REF98124,,65000.00,125000.00
+2026-09-02,Swiggy Takeout,UPI-84920,450.00,,124550.00
+2026-09-03,Amazon Shopping,CHQ88192,1200.00,,123350.00
+2026-09-04,House Rent Transfer,NEFT-4912,15000.00,,108350.00
+2026-09-05,Electricity Bill,BILL-9321,1800.00,,106550.00
+2026-09-06,Consulting Dividend,REF3819,,12000.00,118550.00
+`;
+
 export const CSVImportPage: React.FC<CSVImportPageProps> = ({
   onImportSuccess,
   onNavigateTab,
@@ -53,12 +62,14 @@ export const CSVImportPage: React.FC<CSVImportPageProps> = ({
     }
   };
 
-  const downloadSampleCsv = () => {
-    const blob = new Blob([SAMPLE_CSV], { type: 'text/csv;charset=utf-8;' });
+  const downloadSampleCsv = (isBank: boolean = false) => {
+    const csvContent = isBank ? SAMPLE_BANK_CSV : SAMPLE_CSV;
+    const filename = isBank ? 'bank_statement_sample.csv' : 'finmate_sample_transactions.csv';
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'finmate_sample_transactions.csv');
+    link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

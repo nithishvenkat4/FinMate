@@ -28,17 +28,25 @@ class AnalyticsService:
         totals = self.tx_repo.get_totals_by_type(user_id)
         total_income = totals.get("income", Decimal("0.00"))
         total_expenses = totals.get("expense", Decimal("0.00"))
-
-        # 2. Deterministic calculations
-        net_savings = calculate_savings(total_income, total_expenses)
-        savings_rate = calculate_savings_rate(total_income, net_savings)
         tx_count = self.tx_repo.count_by_user(user_id)
 
-        # 3. Profile details
+        # 2. Profile details
         profile = self.profile_repo.get_by_user_id(user_id)
         profile_income = profile.monthly_income if profile else Decimal("0.00")
         profile_fixed_exp = profile.monthly_fixed_expenses if profile else Decimal("0.00")
         profile_savings = profile.current_savings if profile else Decimal("0.00")
+
+        # 3. Deterministic calculations: If ledger has no transactions, reflect active profile baseline
+        if tx_count == 0 and profile_income > Decimal("0.00"):
+            calc_income = profile_income
+            calc_expenses = profile_fixed_exp
+            net_savings = calculate_savings(calc_income, calc_expenses)
+            savings_rate = calculate_savings_rate(calc_income, net_savings)
+        else:
+            calc_income = total_income
+            calc_expenses = total_expenses
+            net_savings = calculate_savings(total_income, total_expenses)
+            savings_rate = calculate_savings_rate(total_income, net_savings)
 
         # 4. Goals and Investments counts/totals
         goals_count = self.goal_repo.count_by_user(user_id)
@@ -59,8 +67,8 @@ class AnalyticsService:
             )
 
         return AnalyticsSummaryResponse(
-            total_income=total_income,
-            total_expenses=total_expenses,
+            total_income=calc_income,
+            total_expenses=calc_expenses,
             net_savings=net_savings,
             savings_rate=savings_rate,
             transaction_count=tx_count,

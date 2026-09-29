@@ -27,6 +27,16 @@ class DataNormalizer:
         "%Y/%m/%d",
         "%m/%d/%Y",
         "%d.%m.%Y",
+        "%d-%b-%Y",
+        "%d %b %Y",
+        "%d/%b/%Y",
+        "%d-%b-%y",
+        "%d %b %y",
+        "%d/%b/%y",
+        "%d-%B-%Y",
+        "%d %B %Y",
+        "%d/%m/%y",
+        "%d-%m-%y",
     ]
 
     @classmethod

@@ -80,7 +80,9 @@ export function App() {
               <DecisionsPage onNavigateTab={setCurrentTab} />
             )}
             {currentTab === 'ai-advisor' && <AIAdvisorPage />}
-            {currentTab === 'settings' && <SettingsPage onNavigateTab={setCurrentTab} />}
+            {currentTab === 'settings' && (
+              <SettingsPage onNavigateTab={setCurrentTab} onRefresh={handleGlobalRefresh} />
+            )}
           </div>
         </main>
       </div>

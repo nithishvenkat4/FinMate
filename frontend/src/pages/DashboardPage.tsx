@@ -162,7 +162,19 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab, ref
     return list;
   }, [summary, goals]);
 
-  const hasData = summary && (summary.transaction_count > 0 || goals.length > 0);
+  const hasProfileData = Boolean(
+    profile && (Number(profile.monthly_income) > 0 || Number(profile.current_savings) > 0)
+  );
+  const hasData = Boolean(summary && (summary.transaction_count > 0 || goals.length > 0 || hasProfileData));
+
+  const profileSurplus = Math.max(
+    0,
+    (Number(profile?.monthly_income) || 0) - (Number(profile?.monthly_fixed_expenses) || 0)
+  );
+  const coverageMonths =
+    profile && Number(profile.monthly_fixed_expenses) > 0
+      ? (Number(profile.current_savings || 0) / Number(profile.monthly_fixed_expenses)).toFixed(1)
+      : null;
 
   if (loading) {
     return (
@@ -228,14 +240,74 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab, ref
         </div>
       </div>
 
-      {/* When no transactions or goals exist at all, present polished onboarding empty state */}
+      {/* Financial Profile Baseline Snapshot */}
+      {profile && (
+        <div className="p-4 sm:p-5 rounded-2xl border border-teal-100 bg-linear-to-r from-teal-50/60 via-white to-slate-50 shadow-xs space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Wallet className="w-4 h-4 text-teal-600" />
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                Active Financial Profile Baselines
+              </h2>
+            </div>
+            <button
+              onClick={() => onNavigateTab('profile')}
+              className="text-xs font-semibold text-teal-700 hover:text-teal-800 hover:underline transition flex items-center gap-1"
+            >
+              <span>Edit Profile</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 text-xs">
+            <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
+              <span className="text-[11px] text-slate-400 block font-medium">Monthly Income</span>
+              <span className="text-sm font-bold text-slate-900 font-mono block">
+                {formatINR(profile.monthly_income)}
+              </span>
+              <span className="text-[10px] text-emerald-600 block">Baseline inflow</span>
+            </div>
+            <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
+              <span className="text-[11px] text-slate-400 block font-medium">Fixed Expenses</span>
+              <span className="text-sm font-bold text-slate-900 font-mono block">
+                {formatINR(profile.monthly_fixed_expenses)}
+              </span>
+              <span className="text-[10px] text-slate-500 block">Monthly commitments</span>
+            </div>
+            <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
+              <span className="text-[11px] text-slate-400 block font-medium">Planned Monthly Surplus</span>
+              <span className="text-sm font-bold text-teal-700 font-mono block">
+                {formatINR(profileSurplus)}
+              </span>
+              <span className="text-[10px] text-teal-600 block">Discretionary margin</span>
+            </div>
+            <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
+              <span className="text-[11px] text-slate-400 block font-medium">Liquid Savings</span>
+              <span className="text-sm font-bold text-slate-900 font-mono block">
+                {formatINR(profile.current_savings)}
+              </span>
+              <span className="text-[10px] text-blue-600 block">
+                {coverageMonths ? `${coverageMonths} mo emergency buffer` : 'Available reserve'}
+              </span>
+            </div>
+            <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
+              <span className="text-[11px] text-slate-400 block font-medium">Risk Stance</span>
+              <span className="text-sm font-bold text-slate-800 capitalize block">
+                {profile.risk_preference || 'Moderate'}
+              </span>
+              <span className="text-[10px] text-slate-500 block">Scenario strategy</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* When no transactions or goals exist at all and no profile, present polished onboarding empty state */}
       {!hasData && (
         <EmptyState
           icon={Receipt}
           title="Welcome to FinMate"
-          description="Start by adding your first transaction or importing your bank statement to see your cash flow, category breakdowns, and goal tracking come alive."
-          actionLabel="+ Add First Transaction"
-          onAction={() => onNavigateTab('transactions')}
+          description="Start by configuring your financial profile, adding your first transaction, or importing your bank statement to see your cash flow, category breakdowns, and goal tracking come alive."
+          actionLabel="+ Set Financial Profile"
+          onAction={() => onNavigateTab('profile')}
           secondaryActionLabel="Import CSV Statement"
           onSecondaryAction={() => onNavigateTab('import')}
         />
@@ -244,37 +316,63 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigateTab, ref
       {/* 2. Key Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard
-          title="Total Income"
-          value={formatINR(summary?.total_income)}
-          subtitle="Recorded incoming funds"
+          title="Monthly Income"
+          value={formatINR(
+            summary && summary.transaction_count > 0 && Number(summary.total_income) > 0
+              ? summary.total_income
+              : profile?.monthly_income
+          )}
+          subtitle={
+            summary && summary.transaction_count > 0 && Number(summary.total_income) > 0
+              ? (profile?.monthly_income ? `Profile: ${formatINR(profile.monthly_income)}/mo` : 'Recorded incoming funds')
+              : 'Profile baseline income'
+          }
           icon={ArrowUpRight}
           color="emerald"
         />
         <StatCard
           title="Total Expenses"
-          value={formatINR(summary?.total_expenses)}
-          subtitle="Recorded outgoing funds"
+          value={formatINR(
+            summary && summary.transaction_count > 0 && Number(summary.total_expenses) > 0
+              ? summary.total_expenses
+              : profile?.monthly_fixed_expenses
+          )}
+          subtitle={
+            summary && summary.transaction_count > 0 && Number(summary.total_expenses) > 0
+              ? (profile?.monthly_fixed_expenses ? `Fixed: ${formatINR(profile.monthly_fixed_expenses)}/mo` : 'Recorded outgoing funds')
+              : 'Fixed commitments'
+          }
           icon={ArrowDownRight}
           color="rose"
         />
         <StatCard
           title="Net Cash Flow"
-          value={formatINR(summary?.net_savings)}
-          subtitle="Income minus expenses"
+          value={formatINR(
+            summary && summary.transaction_count > 0
+              ? summary.net_savings
+              : profileSurplus
+          )}
+          subtitle={summary && summary.transaction_count > 0 ? 'Income minus expenses' : 'Planned monthly surplus'}
           icon={CheckCircle2}
           color="teal"
         />
         <StatCard
           title="Liquid Savings"
-          value={formatINR(profile?.current_savings || summary?.net_savings)}
-          subtitle="Available liquid cushion"
+          value={formatINR(profile?.current_savings !== undefined && profile?.current_savings !== null ? profile.current_savings : summary?.net_savings)}
+          subtitle={coverageMonths ? `${coverageMonths} mo buffer coverage` : 'Available liquid cushion'}
           icon={Wallet}
           color="cyan"
         />
         <StatCard
           title="Savings Rate"
-          value={formatPercent(summary?.savings_rate)}
-          subtitle="Percentage of income retained"
+          value={formatPercent(
+            summary && summary.transaction_count > 0
+              ? summary.savings_rate
+              : (Number(profile?.monthly_income) > 0
+                  ? (profileSurplus / Number(profile.monthly_income)) * 100
+                  : 0)
+          )}
+          subtitle={summary && summary.transaction_count > 0 ? 'Percentage of income retained' : 'Planned savings margin'}
           icon={Percent}
           color="purple"
         />
